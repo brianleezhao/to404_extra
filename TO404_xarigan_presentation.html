@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>GGPlot Geoms Demo Presentation</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Brian Zhao" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# GGPlot Geoms Demo Presentation
+## ⚔<br/>with xaringan
+### Brian Zhao
+### University of Michigan: TO 404
+### 01/01/2021 (updated: 2021-01-13)
+
+---
+
+
+# Introduction
+
+For this ggplot2 demo I will be using data provide by R (i.e. mtcars), from Airbnb's 2019 listings in New York City, and Diabetes data in the U.S.
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_B%C3%A9lo.svg/440px-Airbnb_Logo_B%C3%A9lo.svg.png)
+
+### Loading Data
+
+```r
+# Includes gender data using gender() package
+airbnb &lt;- read.csv("AB_NYC_2019_Gender.csv")
+diabetes &lt;- read.csv("Diabetes.csv")
+
+# Clean Data
+diabetes$id &lt;- NULL
+diabetes$gender &lt;- as.factor(diabetes$gender)
+diabetes$location &lt;- as.factor(diabetes$location)
+diabetes$frame &lt;- as.factor(diabetes$frame)
+```
+
+---
+
+# geom_point()
+
+Based on this scatter plot using the mtcars data provided R, we can see that heavier cars generally get worse mileage (lower MPG) and the heavier cars also have more cylinders. This makes sense as they would burn more fuel and generally produce more power to move a heavier car.
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-2-1.png" height="300px" /&gt;
+
+---
+
+# geom_jitter()
+
+Based on the Jitter Plot below we can deduce a lot of information about the types of rooms being listed in Manhatten and how they are priced. We can see from the density and number of points that there are significantly more entire homes/apts listed in NYC (25409 entire homes/apts) than private rooms (22326 private rooms), and there is merely 1160 shared rooms listed in all of Manhatten.
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-3-1.png" height="300px" /&gt;
+
+---
+
+# geom_smooth()
+
+This line chart shows the rental price generally declines as the minimum nights increases (up until ~20 days). This makes sense as we know that Airbnb hosts often offer discounts for customers who stay more than a month. This also explains the price jump around the 30 day mark, as it is likely that these Airbnb hosts only offer month-long stays and this is a different demographic of Airbnb host altogether.
+
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-4-1.png" height="300px" /&gt;
+
+---
+
+# geom_col()
+
+Based on the column chart we can see that long descriptions generally command the highest prices at an average of NaN dollars. Average length descriptions command an average price of NaN dollars, and Short descriptions command the lowest average price at NaN dollars. A longer description tells potential customers more about the listing and could lead to higher prices.
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-5-1.png" height="300px" /&gt;
+
+---
+
+# geom_bar()
+
+
+
+This bar chart shows the relative proportion and count of host genders on Airbnb. We can see there are roughly 18857 male hosts, 21437 female hosts, and 8601 hosts where the R gender package couldn't tell. This can also be used to see the relative proportions, but not as well as a pie chart would.
+
+
+```
+##    gender value
+## 1    Male 18857
+## 2  Female 21437
+## 3 Unknown  8601
+```
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-7-1.png" height="300px" /&gt;
+
+---
+
+# geom_boxplot()
+
+Using the diabetes data, we can see how this box plot allows us to visualize the quartiles in which male/female cholesterol levels fall within. This shows that most males and females both have cholesterol levels in the range of 175-225. However, females have more outliers with higher cholesterol than men.
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-8-1.png" height="300px" /&gt;
+
+---
+
+# geom_violin()
+
+Using the diabetes data, we can see that the violin plot shows the relative frequency of individuals who have a certain level or cholesterol, and overall we are looking at how this is distributed between males and females. It seems that for both categories most individuals have around 200 cholesterol.
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-9-1.png" height="300px" /&gt;
+
+---
+
+# geom_histogram()
+
+Using the diabetes data, we can see using this histogram that Glycosolated Hemoglobin is concentrated around the levels or 4/5 and their is a long tail or patients with much higher levels of glyhb. This allows us to see the relative distribution/concentration of glyhb levels across a large population.
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-10-1.png" height="300px" /&gt;
+
+---
+
+# geom_density()
+
+Using the diabetes data, we can see using this density chart (similar to a histogram but show as a more continuous distribution) that Glycosolated Hemoglobin is concentrated around the levels or 4/5 and their is a long tail or patients with much higher levels of glyhb.
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-11-1.png" height="300px" /&gt;
+
+---
+
+# Pie Chart
+
+Similarly to the bar chart, this pie chart shows the relative proportion of host genders on Airbnb. We can see the amount of male hosts (18857) roughly matches the number of female hosts (21437) and that a certain amount of host genders could not be determined using R's Gender package. However, most of these are due to families or couples, which we see is much smaller proportion (8601).
+
+&lt;img src="TO404_xarigan_presentation_files/figure-html/unnamed-chunk-12-1.png" height="300px" /&gt;
+
+---
+
+# Radar/Spider Chart
+
+This radar/spider chart is an example using R's built in mtcars data set. This chart illustrates how 4 different cars compare on various metrics at once, such as mpg, number of cylinders, horsepower, etc. For example, we can see that the Maserati Bora has many cylinders and a lot of horsepower, but in exchange has terrible gas mileage.
+
+![](TO404_xarigan_presentation_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+---
+
+class: center
+
+# Hand seals (印)
+
+Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
+
+![](https://upload.wikimedia.org/wikipedia/commons/7/7e/Mudra-Naruto-KageBunshin.svg)
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](https://yihui.org/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,246 @@
+---
+title: "GGPlot Geoms Demo Presentation"
+subtitle: "⚔<br/>with xaringan"
+author: "Brian Zhao"
+institute: "University of Michigan: TO 404"
+date: "01/01/2021 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+# Introduction
+
+For this ggplot2 demo I will be using data provide by R (i.e. mtcars), from Airbnb's 2019 listings in New York City, and Diabetes data in the U.S.
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Airbnb_Logo_B%C3%A9lo.svg/440px-Airbnb_Logo_B%C3%A9lo.svg.png)
+
+### Loading Data
+```{r}
+# Includes gender data using gender() package
+airbnb <- read.csv("AB_NYC_2019_Gender.csv")
+diabetes <- read.csv("Diabetes.csv")
+
+# Clean Data
+diabetes$id <- NULL
+diabetes$gender <- as.factor(diabetes$gender)
+diabetes$location <- as.factor(diabetes$location)
+diabetes$frame <- as.factor(diabetes$frame)
+```
+
+---
+
+# geom_point()
+
+Based on this scatter plot using the mtcars data provided R, we can see that heavier cars generally get worse mileage (lower MPG) and the heavier cars also have more cylinders. This makes sense as they would burn more fuel and generally produce more power to move a heavier car.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+p <- ggplot(mtcars, aes(wt, mpg))
+p + geom_point(aes(colour = factor(cyl)))  + labs(title = "Relationship Between Car Weight and Mileage", x = "Weight", y = "MPG")
+```
+
+---
+
+# geom_jitter()
+
+Based on the Jitter Plot below we can deduce a lot of information about the types of rooms being listed in Manhatten and how they are priced. We can see from the density and number of points that there are significantly more entire homes/apts listed in NYC (`r nrow(airbnb[airbnb$room_type == "Entire home/apt", ])` entire homes/apts) than private rooms (`r nrow(airbnb[airbnb$room_type == "Private room", ])` private rooms), and there is merely `r nrow(airbnb[airbnb$room_type == "Shared room", ])` shared rooms listed in all of Manhatten.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+ggplot(data = airbnb[airbnb$price < 2500, ], aes(x = room_type, y = price, colour = room_type)) + geom_jitter(alpha=0.25) + labs(title = "Effects of Room Type on Rental Price (Price < $2500)", x = "Room Type", y = "Price")
+```
+
+---
+
+# geom_smooth()
+
+This line chart shows the rental price generally declines as the minimum nights increases (up until ~20 days). This makes sense as we know that Airbnb hosts often offer discounts for customers who stay more than a month. This also explains the price jump around the 30 day mark, as it is likely that these Airbnb hosts only offer month-long stays and this is a different demographic of Airbnb host altogether.
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+ggplot(data = airbnb[airbnb$price < 2500 & airbnb$minimum_nights < 45, ], aes(x = minimum_nights, y = price, colour = room_type)) + geom_smooth() + labs(title = "Effects of Minimum Nights on Rental Price", x = "Minimum Nights (days)", y = "Price")
+```
+
+---
+
+# geom_col()
+
+Based on the column chart we can see that long descriptions generally command the highest prices at an average of `r mean(airbnb$price[airbnb$description == "Long"], )` dollars. Average length descriptions command an average price of `r mean(airbnb$price[airbnb$description == "Average"], )` dollars, and Short descriptions command the lowest average price at `r mean(airbnb$price[airbnb$description == "Short"], )` dollars. A longer description tells potential customers more about the listing and could lead to higher prices.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+library(dplyr)
+# Create Description Length Column
+airbnb$descLength <- nchar(airbnb$name, type = "chars", allowNA = FALSE, keepNA = NA)
+
+# Group Description Lengths into Summary Columns (Short, Average, Long)
+airbnb$description <- "NA"
+num <- 1
+for (i in airbnb$descLength) {
+  if (i < 27) {
+    airbnb$description[num] <- "Short"
+  }
+  else if (i > 47) {
+    airbnb$description[num] <- "Long"
+  }
+  else {
+    airbnb$description[num] <- "Average"
+  }
+  num <- num + 1
+}
+
+# Plot Description Length (grouped) vs. Price
+airbnb %>%
+  group_by(description) %>%
+  summarise(
+    averagePrice = mean(price, na.rm = TRUE)
+  ) %>%
+  arrange(desc(averagePrice)) %>%
+  ggplot(aes(x = reorder(description, -averagePrice), y = averagePrice, fill = description)) + geom_col() + labs(title = "Effects of Description Length on Rental Price", x = "Description Length", y = "Price")
+```
+
+---
+
+# geom_bar()
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+# Count Host Genders
+countM <- sum(airbnb$gender == 'male', na.rm=TRUE)
+countF <- sum(airbnb$gender == 'female', na.rm=TRUE)
+countU <- sum(airbnb$gender == 'unknown', na.rm=TRUE)
+```
+
+This bar chart shows the relative proportion and count of host genders on Airbnb. We can see there are roughly `r countM` male hosts, `r countF` female hosts, and `r countU` hosts where the R gender package couldn't tell. This can also be used to see the relative proportions, but not as well as a pie chart would.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+
+# Data Frame
+df <- data.frame(
+  gender = c("Male", "Female", "Unknown"),
+  value = c(countM, countF, countU)
+  )
+head(df)
+
+# Bar Chart
+ggplot(df, aes(x=gender, y=value, fill=gender)) + geom_bar(width = 1, stat = "identity") + labs(title = "Airbnb Hosts by Gender", x = "Gender", y = "# of Hosts")
+```
+
+---
+
+# geom_boxplot()
+
+Using the diabetes data, we can see how this box plot allows us to visualize the quartiles in which male/female cholesterol levels fall within. This shows that most males and females both have cholesterol levels in the range of 175-225. However, females have more outliers with higher cholesterol than men.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+
+ggplot(data=diabetes, aes(x=gender, y=chol)) + geom_boxplot() + labs(title = "Cholesterol Levels by Gender", x = "Gender", y = "Cholesterol Level")
+```
+
+---
+
+# geom_violin()
+
+Using the diabetes data, we can see that the violin plot shows the relative frequency of individuals who have a certain level or cholesterol, and overall we are looking at how this is distributed between males and females. It seems that for both categories most individuals have around 200 cholesterol.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+
+ggplot(data=diabetes, aes(x=gender, y=chol)) + geom_violin() + labs(title = "Cholesterol Levels by Gender", x = "Gender", y = "Cholesterol Level")
+```
+
+---
+
+# geom_histogram()
+
+Using the diabetes data, we can see using this histogram that Glycosolated Hemoglobin is concentrated around the levels or 4/5 and their is a long tail or patients with much higher levels of glyhb. This allows us to see the relative distribution/concentration of glyhb levels across a large population.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+
+ggplot(data=diabetes, aes(x=glyhb)) + geom_histogram() + labs(title = "Distribution of Glycosolated Hemoglobin Levels Among Diabetes Patients", x = "Glycosolated Hemoglobin Level", y = "Count")
+```
+
+---
+
+# geom_density()
+
+Using the diabetes data, we can see using this density chart (similar to a histogram but show as a more continuous distribution) that Glycosolated Hemoglobin is concentrated around the levels or 4/5 and their is a long tail or patients with much higher levels of glyhb.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+
+ggplot(data=diabetes, aes(x=glyhb)) + geom_density() + labs(title = "Distribution of Glycosolated Hemoglobin Levels Among Diabetes Patients", x = "Glycosolated Hemoglobin Level", y = "Count")
+```
+
+---
+
+# Pie Chart
+
+Similarly to the bar chart, this pie chart shows the relative proportion of host genders on Airbnb. We can see the amount of male hosts (`r countM`) roughly matches the number of female hosts (`r countF`) and that a certain amount of host genders could not be determined using R's Gender package. However, most of these are due to families or couples, which we see is much smaller proportion (`r countU`).
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.height = '300px'}
+library(ggplot2)
+
+# Data Frame
+df <- data.frame(
+  group = c("Male", "Female", "Unknown"),
+  value = c(countM, countF, countU)
+  )
+
+# Bar Chart
+bp <- ggplot(df, aes(x="", y=value, fill=group))+
+geom_bar(width = 1, stat = "identity")
+
+# Pie Chart
+pie <- bp + coord_polar("y", start=0)
+pie + labs(title = "Airbnb Hosts by Gender")
+```
+
+---
+
+# Radar/Spider Chart
+
+This radar/spider chart is an example using R's built in mtcars data set. This chart illustrates how 4 different cars compare on various metrics at once, such as mpg, number of cylinders, horsepower, etc. For example, we can see that the Maserati Bora has many cylinders and a lot of horsepower, but in exchange has terrible gas mileage.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+# devtools::install_github("ricardo-bion/ggradar", dependencies = TRUE)
+library(ggradar)
+suppressPackageStartupMessages(library(dplyr))
+library(scales)
+
+mtcars %>%
+     add_rownames( var = "group" ) %>%
+     mutate_each(funs(rescale), -group) %>%
+     tail(4) %>% select(1:10) -> mtcars_radar
+
+ggradar(mtcars_radar) + labs(title = "Car Comparison Spider Chart")
+```
+
+---
+
+class: center
+
+# Hand seals (印)
+
+Press `h` or `?` to see the possible ninjutsu you can use in remark.js.
+
+![](https://upload.wikimedia.org/wikipedia/commons/7/7e/Mudra-Naruto-KageBunshin.svg)
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](https://yihui.org/knitr), and [R Markdown](https://rmarkdown.rstudio.com).

@@ -1,0 +1,20 @@
+---
+title: "Extra Credit"
+author: "Brian Zhao"
+date: "1/1/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Libraries
+```{r}
+library("ggplot2")
+library("dplyr")
+# install.packages('xaringan')
+library("xaringan")
+```
+
